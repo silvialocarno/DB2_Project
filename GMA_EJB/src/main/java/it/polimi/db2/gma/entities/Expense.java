@@ -11,6 +11,7 @@ import java.math.BigDecimal;
  * 
  */
 
+// test 12343
 @Entity
 @Table(name = "expenses", schema = "db_expense_management")
 @NamedQuery(name = "Expense.findAll", query = "SELECT e FROM Expense e")
