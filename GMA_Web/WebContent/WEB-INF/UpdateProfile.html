@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Profile</title>
+</head>
+<body>
+	<div align="right">
+		<a th:href="@{/Home}">Home</a>
+	</div>
+	<h1>Update your profile</h1>
+	<div>
+		<form th:action="@{/ChangeProfile}" method="POST">
+			First name: <input type="text" name="name" th:value="${session.user.getName()}">
+			<br> Last name: <input type="text" name="surname" th:value="${session.user.getSurname()}">		
+			<button type="submit" name="action" value="submit">Update Profile</button>
+		</form>
+	</div>
+</body>
+</html>

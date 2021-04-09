@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.2"
+	xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd">
+	<persistence-unit name="GMA_EJB"
+		transaction-type="JTA">
+		<jta-data-source>gmaDB</jta-data-source>
+		<class>it.polimi.db2.mission.entities.Expense</class>
+		<class>it.polimi.db2.mission.entities.Mission</class>
+		<class>it.polimi.db2.mission.entities.User</class>
+		<class>it.polimi.db2.mission.entities.Project</class>
+		<class>it.polimi.db2.mission.entities.MySqlTransaction</class>
+		<properties>
+			<property name="eclipselink.logging.level" value="FINE" />
+		</properties>
+	</persistence-unit>
+</persistence>
