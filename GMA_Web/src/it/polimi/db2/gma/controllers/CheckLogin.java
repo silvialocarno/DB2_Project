@@ -1,4 +1,4 @@
-package it.polimi.db2.controllers;
+package it.polimi.db2.gma.controllers;
 
 import java.io.IOException;
 
@@ -16,16 +16,16 @@ import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
-import it.polimi.db2.mission.services.UserService;
-import it.polimi.db2.mission.entities.User;
-import it.polimi.db2.mission.exceptions.CredentialsException;
+import it.polimi.db2.gma.services.UserService;
+import it.polimi.db2.gma.entities.User;
+import it.polimi.db2.gma.exceptions.CredentialsException;
 import javax.persistence.NonUniqueResultException;
 
 @WebServlet("/CheckLogin")
 public class CheckLogin extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private TemplateEngine templateEngine;
-	@EJB(name = "it.polimi.db2.mission.services/UserService")
+	@EJB(name = "it.polimi.db2.gma.services/UserService")
 	private UserService usrService;
 
 	public CheckLogin() {

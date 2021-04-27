@@ -1,4 +1,4 @@
-package it.polimi.db2.controllers;
+package it.polimi.db2.gma.controllers;
 
 import java.io.IOException;
 

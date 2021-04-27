@@ -9,8 +9,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import it.polimi.db2.mission.services.HorizontalPropagationTesterService;
-
 /**
  * You must run this servlet directly and check the log to see how transactions
  * have been created. To make the test, remove the not null constraint on the

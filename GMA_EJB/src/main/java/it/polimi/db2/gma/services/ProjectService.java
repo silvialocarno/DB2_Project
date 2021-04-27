@@ -1,4 +1,4 @@
-package it.polimi.db2.mission.services;
+package it.polimi.db2.gma.services;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -6,11 +6,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 
-import it.polimi.db2.mission.exceptions.ProjectException;
-
-import it.polimi.db2.mission.entities.Project;
-import it.polimi.db2.mission.entities.Expense;
-import it.polimi.db2.mission.entities.Mission;
+import it.polimi.db2.gma.exceptions.ProjectException;
 
 import java.util.List;
 import java.math.BigDecimal;
@@ -26,19 +22,19 @@ public class ProjectService {
 	public ProjectService() {
 	}
 
-	public List<Project> findAllProjects() throws ProjectException {
-		List<Project> projects = null;
+	public List<it.polimi.db2.mission.entities.Questionnarie> findAllProjects() throws ProjectException {
+		List<it.polimi.db2.mission.entities.Questionnarie> questionnaries = null;
 		try {
-			projects = em.createNamedQuery("Project.findAll", Project.class).getResultList();
+			questionnaries = em.createNamedQuery("Project.findAll", it.polimi.db2.mission.entities.Questionnarie.class).getResultList();
 
 		} catch (PersistenceException e) {
 			throw new ProjectException("Cannot load projects");
 
 		}
-		return projects;
+		return questionnaries;
 	}
 
-	public void updateBudget(Expense e, Project p) {
+	public void updateBudget(it.polimi.db2.mission.entities.Product e, it.polimi.db2.mission.entities.Questionnarie p) {
 		/*
 		 * This method is called by another service (ExpenseReportService) in method
 		 * addExpenseReport(). We track the low-level TX id to show how methods of
@@ -74,7 +70,7 @@ public class ProjectService {
 
 	public void associateMission(int projectId, int missionId) {
 		System.out.println("Entering method associateMission");
-		Mission m = em.find(Mission.class, missionId);
+		it.polimi.db2.mission.entities.Marketing_answer m = em.find(it.polimi.db2.mission.entities.Marketing_answer.class, missionId);
 		/*
 		 * Refresh aligns the mission to the current database state. This allows you to
 		 * repeat the test multiple time by setting to null the project of a mission in
@@ -84,7 +80,7 @@ public class ProjectService {
 		em.refresh(m);
 		System.out.println("Mission id in method associateMission is " + missionId);
 		System.out.println("Mission description in method associateMission is " + m.getDescription());
-		Project p = em.find(Project.class, projectId);
+		it.polimi.db2.mission.entities.Questionnarie p = em.find(it.polimi.db2.mission.entities.Questionnarie.class, projectId);
 		String s = (m == null) ? "Mission is null" : "Mission Id  is " + m.getId();
 		System.out.println("Mission Id in method associateMission is " + s);
 		System.out.println("Project in method associateMission is " + p.getId());

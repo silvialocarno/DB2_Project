@@ -1,4 +1,4 @@
-package it.polimi.db2.mission.services;
+package it.polimi.db2.gma.services;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -6,10 +6,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 
-import it.polimi.db2.mission.exceptions.*;
-import it.polimi.db2.mission.entities.Mission;
-import it.polimi.db2.mission.entities.MissionStatus;
-import it.polimi.db2.mission.entities.Expense;
+import it.polimi.db2.gma.exceptions.*;
 
 @Stateless
 public class ExpenseReportService {
@@ -24,27 +21,27 @@ public class ExpenseReportService {
 	public ExpenseReportService() {
 	}
 
-	public Expense findExpensesForMission(int missionId) {
-		Expense expenseReport = em.find(Mission.class, missionId).getExpense();
-		return expenseReport;
+	public it.polimi.db2.mission.entities.Product findExpensesForMission(int missionId) {
+		it.polimi.db2.mission.entities.Product productReport = em.find(it.polimi.db2.mission.entities.Marketing_answer.class, missionId).getExpense();
+		return productReport;
 	}
 
-	public void addExpenseReport(Expense expenseReport, int missionId, int reporterId)
+	public void addExpenseReport(it.polimi.db2.mission.entities.Product productReport, int missionId, int reporterId)
 			throws BadMissionForExpReport, InvalidExpenseReport, BadMissionReporter, NotEnoughBudget {
 		// Check that the mission exists and is in OPEN state
 
-		Mission mission = null;
+		it.polimi.db2.mission.entities.Marketing_answer marketinganswer = null;
 		try {
-			mission = em.find(Mission.class, missionId);
+			marketinganswer = em.find(it.polimi.db2.mission.entities.Marketing_answer.class, missionId);
 		} catch (PersistenceException e) {
 			throw new BadMissionForExpReport("Failed to fetch mission");
 		} // now mission is managed
 
-		if (mission == null | mission.getStatus() != MissionStatus.OPEN) {
+		if (marketinganswer == null | marketinganswer.getStatus() != it.polimi.db2.mission.entities.Question.OPEN) {
 			throw new BadMissionForExpReport("Mission not found or in wrong status");
 		}
 		// Check that the user is the owner of the mission
-		if (mission.getReporter().getId() != reporterId) {
+		if (marketinganswer.getReporter().getId() != reporterId) {
 			throw new BadMissionReporter("Reporter not authorized to add expense report");
 		}
 		try {
@@ -64,8 +61,8 @@ public class ExpenseReportService {
 			 * ExpenseReportService business component
 			 */
 
-			mission.setStatus(MissionStatus.REPORTED);
-			mission.setExpense(expenseReport);
+			marketinganswer.setStatus(it.polimi.db2.mission.entities.Question.REPORTED);
+			marketinganswer.setExpense(productReport);
 			/*
 			 * To have a valid, not null transaction Id in MySQl there must be some updates,
 			 * so we query the transaction status after we have made some updates to managed
@@ -92,20 +89,20 @@ public class ExpenseReportService {
 			 * updateBudget() method call of the ProjectService EJB component (even if such
 			 * service has its own EM, which gets bound to the same Persistence Unit)
 			 */
-			prjService.updateBudget(expenseReport, mission.getProject());
+			prjService.updateBudget(productReport, marketinganswer.getProject());
 
 			// for debugging, let's check if expenseReport is managed
 			System.out.println("addExpenseReport method");
 			System.out.println("Expense report object BEFORE persist(mission) in the managed state? "
-					+ em.contains(expenseReport));
+					+ em.contains(productReport));
 
 			// expenseReport.setMission(mission); not needed see Mission.setExpense()
-			em.persist(mission); // this makes the unmanaged expense report managed via cascading
+			em.persist(marketinganswer); // this makes the unmanaged expense report managed via cascading
 
 			// for debugging, let's check if expenseReport is managed
 			System.out.println("addExpenseReport method");
 			System.out.println(
-					"Expense report object AFTER persist(mission) in the managed state? " + em.contains(expenseReport));
+					"Expense report object AFTER persist(mission) in the managed state? " + em.contains(productReport));
 
 			em.flush(); // this is needed to check the DB constraints immediately
 			// for debugging
@@ -128,13 +125,13 @@ public class ExpenseReportService {
 	 * DISTINCT TRANSACTIONS.
 	 */
 
-	public void addExpenseReportWrong(Expense expenseReport, int missionId, int reporterId)
+	public void addExpenseReportWrong(it.polimi.db2.mission.entities.Product productReport, int missionId, int reporterId)
 			throws BadMissionForExpReport, InvalidExpenseReport, BadMissionReporter, NotEnoughBudget {
 		System.out.println("Entering method addExpenseReportWrong of ExpenseReportService EJB");
 
-		Mission mission = null;
+		it.polimi.db2.mission.entities.Marketing_answer marketinganswer = null;
 		try {
-			mission = em.find(Mission.class, missionId);
+			marketinganswer = em.find(it.polimi.db2.mission.entities.Marketing_answer.class, missionId);
 		} catch (PersistenceException e) {
 			throw new BadMissionForExpReport("Failed to fetch mission");
 		}
@@ -144,11 +141,11 @@ public class ExpenseReportService {
 		 * OUTSIDE THIS METHOD BEFORE THE EXPENSES ARE ADDED, SO HERE WE HAVE TO TEST
 		 * THAT THE MISSION IS IN THE (WRONG) REPORTED STATE INSTEAD OF THE OPEN STATE
 		 */
-		if (mission == null | mission.getStatus() != MissionStatus.REPORTED) {
+		if (marketinganswer == null | marketinganswer.getStatus() != it.polimi.db2.mission.entities.Question.REPORTED) {
 			throw new BadMissionForExpReport("Mission not found or in wrong status");
 		}
 		// Check that the user is the owner of the mission
-		if (mission.getReporter().getId() != reporterId) {
+		if (marketinganswer.getReporter().getId() != reporterId) {
 			throw new BadMissionReporter("Reporter not authorized to add expense report");
 		}
 		try {
@@ -163,13 +160,13 @@ public class ExpenseReportService {
 			JPATxUtils.printTxId(); // This prints the high level Id and status of the JTA transaction
 			JPATxUtils.printTxStatus();
 
-			mission.setExpense(expenseReport);
+			marketinganswer.setExpense(productReport);
 
 			util.printMySQLTxStatus();
 
-			prjService.updateBudget(expenseReport, mission.getProject());
+			prjService.updateBudget(productReport, marketinganswer.getProject());
 
-			em.persist(mission); // this makes the unmanaged expense report managed via cascading
+			em.persist(marketinganswer); // this makes the unmanaged expense report managed via cascading
 			em.flush(); // this is needed to check the DB constraints immediately
 			// for debugging
 			System.out.println("Exiting method addExpenseReportWrong of ExpenseReportService EJB");

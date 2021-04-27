@@ -1,17 +1,17 @@
-package it.polimi.db2.mission.services;
+package it.polimi.db2.gma.services;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.NonUniqueResultException;
-import it.polimi.db2.mission.entities.User;
-import it.polimi.db2.mission.exceptions.*;
+import it.polimi.db2.gma.entities.User;
+import it.polimi.db2.gma.exceptions.*;
 import java.util.List;
 
 @Stateless
 public class UserService {
-	@PersistenceContext(unitName = "MissionExpensesEJB")
+	@PersistenceContext(unitName = "GMA_EJB")
 	private EntityManager em;
 
 	public UserService() {
@@ -31,13 +31,5 @@ public class UserService {
 			return uList.get(0);
 		throw new NonUniqueResultException("More than one user registered with same credentials");
 
-	}
-
-	public void updateProfile(User u) throws UpdateProfileException {
-		try {
-			em.merge(u);
-		} catch (PersistenceException e) {
-			throw new UpdateProfileException("Could not change profile");
-		}
 	}
 }

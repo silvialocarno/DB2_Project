@@ -1,4 +1,4 @@
-package it.polimi.db2.mission.services;
+package it.polimi.db2.gma.services;
 
 import java.util.List;
 import java.util.Date;
@@ -10,11 +10,8 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.NonUniqueResultException;
 
-import it.polimi.db2.mission.exceptions.*;
-import it.polimi.db2.mission.entities.Mission;
-import it.polimi.db2.mission.entities.MissionStatus;
-import it.polimi.db2.mission.entities.User;
-import it.polimi.db2.mission.entities.Project;
+import it.polimi.db2.gma.exceptions.*;
+import it.polimi.db2.gma.entities.User;
 
 @Stateless
 public class MissionService {
@@ -30,110 +27,110 @@ public class MissionService {
 	// from the cache. If a mission is deleted by the JPA application, the
 	// persistence context evicts it, this method no longer
 	// retrieves it, and relationship sorting by the client works
-	public List<Mission> findMissionsByUser(int userId) {
+	public List<it.polimi.db2.mission.entities.Marketing_answer> findMissionsByUser(int userId) {
 		User reporter = em.find(User.class, userId);
-		List<Mission> missions = reporter.getMissions();
-		return missions;
+		List<it.polimi.db2.mission.entities.Marketing_answer> marketinganswers = reporter.getMissions();
+		return marketinganswers;
 	}
 
-	public List<Mission> findMissionsByUserRefresh(int userId) {
+	public List<it.polimi.db2.mission.entities.Marketing_answer> findMissionsByUserRefresh(int userId) {
 		User reporter = em.find(User.class, userId);
 		em.refresh(reporter);
-		List<Mission> missions = reporter.getMissions();
-		return missions;
+		List<it.polimi.db2.mission.entities.Marketing_answer> marketinganswers = reporter.getMissions();
+		return marketinganswers;
 	}
 
 	// If a mission is deleted by a concurrent transaction this method
 	// bypasses the cache and sees the correct list. Sorting is done by the query
-	public List<Mission> findMissionsByUserNoCache(int userId) {
-		List<Mission> missions = em
-				.createQuery("Select m from Mission m where m.reporter.id = :repId ORDER BY m.date DESC", Mission.class)
+	public List<it.polimi.db2.mission.entities.Marketing_answer> findMissionsByUserNoCache(int userId) {
+		List<it.polimi.db2.mission.entities.Marketing_answer> marketinganswers = em
+				.createQuery("Select m from MarketingAnswer m where m.reporter.id = :repId ORDER BY m.date DESC", it.polimi.db2.mission.entities.Marketing_answer.class)
 				.setHint("javax.persistence.cache.storeMode", "REFRESH").setParameter("repId", userId).getResultList();
 
-		return missions;
+		return marketinganswers;
 	}
 
 	// If a mission is deleted by a concurrent transaction this method
 	// bypasses the cache and sees the correct list. Sorting is done by the query
-	public List<Mission> findMissionsByUserJPQL(int userId) {
-		List<Mission> missions = em
-				.createQuery("Select m from Mission m where m.reporter.id = :repId ORDER BY m.date DESC", Mission.class)
+	public List<it.polimi.db2.mission.entities.Marketing_answer> findMissionsByUserJPQL(int userId) {
+		List<it.polimi.db2.mission.entities.Marketing_answer> marketinganswers = em
+				.createQuery("Select m from MarketingAnswer m where m.reporter.id = :repId ORDER BY m.date DESC", it.polimi.db2.mission.entities.Marketing_answer.class)
 				.setParameter("repId", userId).getResultList();
 
-		return missions;
+		return marketinganswers;
 	}
 
-	public Mission findMissionById(int missionId) {
-		Mission mission = em.find(Mission.class, missionId);
-		return mission;
+	public it.polimi.db2.mission.entities.Marketing_answer findMissionById(int missionId) {
+		it.polimi.db2.mission.entities.Marketing_answer marketinganswer = em.find(it.polimi.db2.mission.entities.Marketing_answer.class, missionId);
+		return marketinganswer;
 	}
 
 	public void createMission(Date startDate, int days, String destination, String description, int reporterId,
 			int projectId) {
 		User reporter = em.find(User.class, reporterId);
-		Project prj = em.find(Project.class, projectId);
-		Mission mission = new Mission(startDate, days, destination, description, reporter, prj);
+		it.polimi.db2.mission.entities.Questionnarie prj = em.find(it.polimi.db2.mission.entities.Questionnarie.class, projectId);
+		it.polimi.db2.mission.entities.Marketing_answer marketinganswer = new it.polimi.db2.mission.entities.Marketing_answer(startDate, days, destination, description, reporter, prj);
 		// for debugging: let's check if mission is managed
 		System.out.println("Method createMission before reporter.addMission(mission)");
-		System.out.println("Is mission object managed?  " + em.contains(mission));
+		System.out.println("Is mission object managed?  " + em.contains(marketinganswer));
 
-		reporter.addMission(mission); // updates both sides of the relationship
+		reporter.addMission(marketinganswer); // updates both sides of the relationship
 		
 		System.out.println("Method createMission AFTER reporter.addMission(mission)");
-		System.out.println("Is mission object managed?  " + em.contains(mission));
+		System.out.println("Is mission object managed?  " + em.contains(marketinganswer));
 
 		
 		em.persist(reporter); // makes also mission object managed via cascading
 		
 		System.out.println("Method createMission after em.persist()");
-		System.out.println("Is mission object managed?  " + em.contains(mission));
+		System.out.println("Is mission object managed?  " + em.contains(marketinganswer));
 
 	}
 
 // only for testing horizontal propagation
-	public Mission findUnassignedMission() throws NonUniqueResultException {
+	public it.polimi.db2.mission.entities.Marketing_answer findUnassignedMission() throws NonUniqueResultException {
 		System.out.println("Entering method findUnassignedMission");
-		List<Mission> missions = null;
-		missions = em.createQuery("Select m from Mission m where m.project is null", Mission.class).getResultList();
-		if (missions.isEmpty())
+		List<it.polimi.db2.mission.entities.Marketing_answer> marketinganswers = null;
+		marketinganswers = em.createQuery("Select m from MarketingAnswer m where m.project is null", it.polimi.db2.mission.entities.Marketing_answer.class).getResultList();
+		if (marketinganswers.isEmpty())
 			return null;
-		else if (missions.size() == 1) {
-			missions.get(0).setDescription("Unassigned Mission");
+		else if (marketinganswers.size() == 1) {
+			marketinganswers.get(0).setDescription("Unassigned Mission");
 			JPATxUtils.printTxId(); // Prints the JTA high level transaction hash
 			JPATxUtils.printTxStatus(); // Prints the JTA high level transaction status
-			return missions.get(0);
+			return marketinganswers.get(0);
 		}
 		throw new NonUniqueResultException("More than one test mission without project");
 	}
 
 	public void closeMission(int missionId, int reporterId) throws BadMissionReporter, BadMissionForClosing {
-		Mission mission = em.find(Mission.class, missionId);
-		if (mission.getReporter().getId() != reporterId) {
+		it.polimi.db2.mission.entities.Marketing_answer marketinganswer = em.find(it.polimi.db2.mission.entities.Marketing_answer.class, missionId);
+		if (marketinganswer.getReporter().getId() != reporterId) {
 			throw new BadMissionReporter("Reporter not authorized to close this mission");
 		}
 
-		if (mission.getStatus() != MissionStatus.REPORTED) {
+		if (marketinganswer.getStatus() != it.polimi.db2.mission.entities.Question.REPORTED) {
 			throw new BadMissionForClosing("Not possible to close a non reported mission");
 		}
 
-		mission.setStatus(MissionStatus.CLOSED);
+		marketinganswer.setStatus(it.polimi.db2.mission.entities.Question.CLOSED);
 		// for debugging: let's check if mission is managed
 		System.out.println("Method closeMission");
-		System.out.println("Is mission object managed?  " + em.contains(mission));
+		System.out.println("Is mission object managed?  " + em.contains(marketinganswer));
 		// em.persist(mission); unnecessary, mission is already managed
 
 	}
 
 	public void deleteMission(int missionId, int reporterId) throws BadMissionReporter {
-		Mission mission = em.find(Mission.class, missionId);
+		it.polimi.db2.mission.entities.Marketing_answer marketinganswer = em.find(it.polimi.db2.mission.entities.Marketing_answer.class, missionId);
 		User owner = em.find(User.class, reporterId);
-		Project prj = mission.getProject();
-		if (mission.getReporter() != owner) {
+		it.polimi.db2.mission.entities.Questionnarie prj = marketinganswer.getProject();
+		if (marketinganswer.getReporter() != owner) {
 			throw new BadMissionReporter("Reporter not authorized to delete this mission");
 		}
-		owner.removeMission(mission); // this updates both directions of the associations
-		prj.removeMission(mission);
-		em.remove(mission);
+		owner.removeMission(marketinganswer); // this updates both directions of the associations
+		prj.removeMission(marketinganswer);
+		em.remove(marketinganswer);
 	}
 
 	/*
@@ -147,23 +144,23 @@ public class MissionService {
 			throws BadMissionReporter, BadMissionForExpReport, InvalidStatusChange {
 		System.out.println("Entering reportMission() method of MissionService component");
 
-		Mission mission = null;
+		it.polimi.db2.mission.entities.Marketing_answer marketinganswer = null;
 		try {
-			mission = em.find(Mission.class, missionId);
+			marketinganswer = em.find(it.polimi.db2.mission.entities.Marketing_answer.class, missionId);
 		} catch (PersistenceException e) {
 			throw new BadMissionForExpReport("Could not fetch the mission");
 		}
 
-		if (mission.getReporter().getId() != reporterId) {
+		if (marketinganswer.getReporter().getId() != reporterId) {
 			throw new BadMissionReporter("Reporter not authorized to report this mission");
 		}
-		if (mission.getStatus() != MissionStatus.OPEN) {
+		if (marketinganswer.getStatus() != it.polimi.db2.mission.entities.Question.OPEN) {
 			throw new BadMissionForExpReport("Mission not open");
 		}
 
 		System.out.println("Method reportMission: Setting the mission status to REPORTED");
 
-		mission.setStatus(MissionStatus.REPORTED); // this could be encapsulated into a method
+		marketinganswer.setStatus(it.polimi.db2.mission.entities.Question.REPORTED); // this could be encapsulated into a method
 
 		util.printMySQLTxStatus();
 		JPATxUtils.printTxId();

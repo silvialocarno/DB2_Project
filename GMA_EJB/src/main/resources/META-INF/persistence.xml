@@ -6,11 +6,15 @@
 	<persistence-unit name="GMA_EJB"
 		transaction-type="JTA">
 		<jta-data-source>gmaDB</jta-data-source>
-		<class>it.polimi.db2.mission.entities.Expense</class>
-		<class>it.polimi.db2.mission.entities.Mission</class>
-		<class>it.polimi.db2.mission.entities.User</class>
-		<class>it.polimi.db2.mission.entities.Project</class>
-		<class>it.polimi.db2.mission.entities.MySqlTransaction</class>
+		<class>it.polimi.db2.gma.entities.Product</class>
+		<class>it.polimi.db2.gma.entities.Access</class>
+		<class>it.polimi.db2.gma.entities.User</class>
+		<class>it.polimi.db2.gma.entities.Offensive_word</class>
+		<class>it.polimi.db2.gma.entities.Question</class>
+		<class>it.polimi.db2.gma.entities.Review</class>
+		<class>it.polimi.db2.gma.entities.Questionnaire</class>
+		<class>it.polimi.db2.gma.entities.MarketingAnswer</class>
+		<class>it.polimi.db2.gma.entities.Leaderboard</class>
 		<properties>
 			<property name="eclipselink.logging.level" value="FINE" />
 		</properties>

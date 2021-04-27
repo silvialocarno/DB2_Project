@@ -1,7 +1,14 @@
-package it.polimi.db2.controllers;
+package it.polimi.db2.gma.controllers;
 
-import java.io.IOException;
+import it.polimi.db2.gma.entities.Questionnaire;
+import it.polimi.db2.gma.entities.User;
+import it.polimi.db2.gma.services.QuestionnaireService;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.WebContext;
+import org.thymeleaf.templatemode.TemplateMode;
+import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
+import javax.ejb.EJB;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -9,18 +16,16 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.WebContext;
-import org.thymeleaf.templatemode.TemplateMode;
-import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
-
-@WebServlet("/UpdateProfile")
-public class GoToProfilePage extends HttpServlet {
+@WebServlet("/Leaderboard")
+public class Leaderboard extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private TemplateEngine templateEngine;
+	@EJB(name = "it.polimi.db2.gma.services/QuestionnaireService")
+	private QuestionnaireService qService;
 
-	public GoToProfilePage() {
+	public Leaderboard() {
 		super();
 	}
 
@@ -43,9 +48,24 @@ public class GoToProfilePage extends HttpServlet {
 			return;
 		}
 
-		String path = "/WEB-INF/UpdateProfile.html";
+		User user = (User) session.getAttribute("user");
+
+		Questionnaire questionnaire = null;
+
+		try {
+
+			  questionnaire = qService.getQuestOfTheDay();
+		} catch (Exception e) {
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to get data");
+			return;
+		}
+
+		// Redirect to the Home page and add missions to the parameters
+		String path = "/WEB-INF/Home.html";
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
+		ctx.setVariable("questionnaire", questionnaire);
+		//ctx.setVariable("alreadySubmitted", alreadySubmitted);
 		templateEngine.process(path, ctx, response.getWriter());
 	}
 

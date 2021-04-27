@@ -8,65 +8,31 @@
 </head>
 <body>
 	<div align="right">
-		<a th:href="@{/UpdateProfile}">Profile</a>
-	</div>
-	<div align="right">
 		<a th:href="@{/Logout}">Logout</a>
 	</div>
-	<h1>Welcome to the Mission Management Home Page</h1>
-	<p
-		th:text="${'Nice to see you again ' + session.user.name + ' ' + session.user.surname}"></p>
 
-	<table>
-		<thead>
-			<tr>
-				<th>Destination</th>
-				<th>Date</th>
-				<th>Details</th>
-				<th>Delete</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr th:each="m : ${missions}">
-				<td th:text="${m.destination}"></td>
-				<td th:text="${ m.date }"></td>
-				<td><a th:href="@{/GetMissionDetails(missionid=${m.id})}">Details</a></td>
-				<td><a th:href="@{/DeleteMission(missionid=${m.id})}">Delete</a></td>
-			</tr>
-		</tbody>
-	</table>
-
-	<div>
-		<p>Complete the form to create a mission</p>
-		<form action="#" th:action="@{/CreateMission}" method="POST">
-			<fieldset>
-				<p>
-					Destination: <input type="text" name="destination" required />
-				</p>
-				<p>
-					Description: <input type="text" name="description" required />
-				</p>
-				<p>
-					Start Day: <input type="date" name="date"
-						th:attr="min=${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}"
-						placeholder="yyyy-mm-dd" required />
-				</p>
-				<p>
-					Duration (in days): <input type="number" name="days" min=0 required />
-				</p>
-
-				<p>
-					<label for="projects">Choose a project:</label> 
-					<select name="projectId" id="projectId">
-						<option th:each="p : ${projects}" th:value="${p.id}"
-							th:text="${p.name}"></option>
-					</select>
-				</p>
-
-
-				<input type="submit" name="Create Mission">
-			</fieldset>
-		</form>
+	<div align="right">
+		<a th:href="@{/Leaderboard}">Leaderboard</a>
 	</div>
+
+	<h1>Welcome to the Gamified Marketing Application Home Page</h1>
+		<p th:if="${questionnaire == null}" th:text="${'Nice to see you again ' + session.user.username + '!\n Today there is no product'}"></p>
+
+	<div th:if="${questionnaire != null}">
+		<p th:text="${'Nice to see you again ' + session.user.username + '!\n Here there is the product of the day:'}"></p>
+		<p th:text = "${'Name: ' + questionnaire.getProduct().getName()}"></p>
+		<img th:src="*{'data:image/png;base64,'+ questionnaire.getProduct().getPhotoData()}">
+		<p th:if = "${session.user.getBlocked()}">You are blocked!</p>
+		<p th:if="${not session.user.getBlocked() && alreadySubmitted}"> The questionnaire of the day has been already submitted </p>
+		<a th:if="${not session.user.getBlocked() && not alreadySubmitted}" th:href="@{/Questionnaire}">Questionnaire</a>
+ 	</div>
+
+	<div th:if="${questionnaire != null}">
+		<p>Here there are the product's reviews:</p>
+		<th:block th:each="r : ${questionnaire.getProduct().getReviews()}">
+		<p th:utext="'Review by ' + ${r.getReviewUser().getUsername()} + ':<br/>' + ${r.getText()}"></p>
+		</th:block>
+	</div>
+
 </body>
 </html>

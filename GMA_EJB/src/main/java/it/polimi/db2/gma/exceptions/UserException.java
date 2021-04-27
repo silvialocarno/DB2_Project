@@ -1,9 +1,9 @@
 package it.polimi.db2.gma.exceptions;
 
-public class InvalidStatusChange extends Exception {
+public class UserException extends Exception {
 	private static final long serialVersionUID = 1L;
 
-	public InvalidStatusChange(String message) {
+	public UserException(String message) {
 		super(message);
 	}
 }
