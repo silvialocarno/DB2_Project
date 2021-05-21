@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>QuestionnaireDetails</title>
+<link rel="stylesheet" type="text/css" media="all"
+	href="../CSS/mystyle.css" th:href="@{/css/mystyle.css}" />
+</head>
+<body>
+	<div align="right">
+		<a th:href="@{/Logout}">Logout</a>
+	</div>
+
+	<div align="right">
+		<a th:href="@{/Inspection}">InspectionPage</a>
+	</div>
+
+	<h1>Questionnaire Details</h1>
+
+	<p th:utext="'Table of users who submitted the questionnaire with relative marketing answers:' "></p>
+	<table>
+		<thead>
+		<tr>
+			<th>User</th>
+			<th>Question</th>
+			<th>Answer</th>
+		</tr>
+		</thead>
+		<tbody>
+		<tr th:each="a : ${marketingAnswers}">
+			<td th:text="${a.getAnswerUser().getUsername()}"></td>
+			<td th:text="${ a.getQuestion().getQuestion_text() }"></td>
+			<td th:text="${a.getAnswer_text()}"></td>
+		</tr>
+	</table>
+		</tbody><p th:utext="'Table of users who submitted the questionnaire with relative statistical answers:' "></p>
+		<table>
+			<thead>
+			<tr>
+				<th>User</th>
+				<th>Age</th>
+				<th>Sex</th>
+				<th>Expertise Level</th>
+			</tr>
+			</thead>
+			<tbody>
+			<tr th:each="a : ${statisticalAnswers}">
+				<td th:text="${a.getAnswerUser().getUsername()}"></td>
+				<td th:text="${a.getAge()}"></td>
+				<td th:text="${a.getSex()}"></td>
+				<td th:text="${a.getExpertise_level()}"></td>
+			</tr>
+			</tbody>
+		</table>
+	</table>
+
+	<p th:utext="'List of users who cancelled the questionnaire:' "></p>
+	<th:block th:each="u : ${cancelUsers}">
+		<p th:utext="'Username: ' + ${u.username}"></p>
+	</th:block>
+
+</body>
+</html>

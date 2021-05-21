@@ -1,19 +1,10 @@
 package it.polimi.db2.gma.entities;
 
-import it.polimi.db2.gma.entities.PK.QuestionnairePK;
 import it.polimi.db2.gma.entities.PK.ReviewPK;
 
 import java.io.Serializable;
 
 import javax.persistence.*;
-
-import java.math.BigDecimal;
-import java.util.Date;
-
-/**
- * The persistent class for the expenses database table.
- *
- */
 
 @Entity
 @Table(name = "review", schema = "db_gamified_marketing_application")
@@ -24,12 +15,12 @@ public class Review implements Serializable {
     @EmbeddedId
     private ReviewPK id;
 
-    @ManyToOne
+    @ManyToOne //Eager because I print the username in home html
     @MapsId("userId")
     @JoinColumn(name = "user")
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("productId")
     @JoinColumn(name = "product")
     private Product product;

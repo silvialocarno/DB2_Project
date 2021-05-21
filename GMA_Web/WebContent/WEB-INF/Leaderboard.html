@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>Leaderboard</title>
+<link rel="stylesheet" type="text/css" media="all" href="../css/mystyle.css" th:href="@{/css/mystyle.css}" />
+</head>
+<body>
+	<div align="right">
+		<a th:href="@{/Logout}">Logout</a>
+	</div>
+	<div align="right">
+		<a th:href="@{/Home}">Homepage</a>
+	</div>
+	<h1>Leaderboard</h1>
+	<div>
+		<p>Here there is the leaderboard:</p>
+		<th:block th:each="s : ${questionnaire.getLeaderboard()}">
+			<p th:utext="'User: ' + ${s.getLeaderboardUser().getUsername()} + ' score: ' + ${s.getScore()}"></p>
+		</th:block>
+	</div>
+
+</body>
+</html>

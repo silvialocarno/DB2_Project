@@ -14,8 +14,13 @@ public class QuestionPK implements Serializable {
     @Column(name = "questionnaire")
     private int questionnaireId;
 
-    public QuestionPK() {
+
+    public QuestionPK(int questionnaire_id, int i){
+        this.questionId = i + 1;
+        this.questionnaireId = questionnaire_id;
     }
+
+    public QuestionPK() {}
 
     public int getQuestionId() {
         return questionId;
@@ -24,6 +29,7 @@ public class QuestionPK implements Serializable {
     public int getQuestionnaireId() {
         return questionnaireId;
     }
+
 
     @Override
     public boolean equals(Object o) {

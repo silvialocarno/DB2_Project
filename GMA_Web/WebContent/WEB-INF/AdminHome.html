@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>AdminHome</title>
+<link rel="stylesheet" type="text/css" media="all"
+	href="../CSS/mystyle.css" th:href="@{/css/mystyle.css}" />
+</head>
+<body>
+	<div align="right">
+		<a th:href="@{/Logout}">Logout</a>
+	</div>
+
+	<h1>Welcome to the Gamified Marketing Application Home Page</h1>
+
+	<div>
+		<p th:text="${'Nice to see you again ' + session.user.username + '!\n Here there are the pages you can access:'}"></p>
+		<p th:text="${'\n'}"></p>
+		<a th:href="@{/Creation}">Creation Page</a>
+		<p th:text="${'\n'}"></p>
+		<a th:href="@{/Inspection}">Inspection Page</a>
+		<p th:text="${'\n'}"></p>
+		<a th:href="@{/Deletion}">Deletion Page</a>
+	</div>
+
+
+</body>
+</html>

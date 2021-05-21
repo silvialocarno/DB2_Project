@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>CreationPage</title>
+<link rel="stylesheet" type="text/css" media="all"
+	href="../CSS/mystyle.css" th:href="@{/css/mystyle.css}" />
+	<script src="../js/creation.js" th:src="@{/js/creation.js}" charset="UTF-8" defer></script>
+</head>
+<body>
+	<div align="right">
+		<a th:href="@{/Logout}">Logout</a>
+	</div>
+	<div align="right">
+		<a th:href="@{/Home}">Homepage</a>
+	</div>
+
+	<h1>Creation Page</h1>
+
+	<div class="formdiv">
+		<p>Complete the form to create a product:</p>
+		<form id="product" action="#" th:action="@{/CreateProduct}" method="POST"
+			  enctype="multipart/form-data">
+			<fieldset>
+				<p>
+					Name: <input type="text" name="name" required />
+				</p>
+				<p>
+					Full image: <input type="file" id="productPhoto" name="picture">
+				</p>
+
+				<input type="submit" name="Create product" value="Create">
+			</fieldset>
+		</form>
+	</div>
+	<div class="formdiv">
+		<p>Complete the form to create a questionnaire:</p>
+		<form id="questionnaire" action="#" th:action="@{/CreateQuestionnaire}" method="POST">
+			<fieldset>
+				<p>
+					<label for="productId">Choose a product:</label> <select name="productId"
+																		 id="productId">
+					<option th:each="p : ${products}" th:value="${p.product_id}"
+							th:text="${p.name}"></option>
+				</select>
+				</p>
+				<p>
+					Date: <input type="date" name="day"
+									  th:attr="min=${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}"
+									  placeholder="yyyy-mm-dd" required />
+				</p>
+				</p>
+
+				<div id="questions">
+					<div class="columns" id="questionDiv1">
+						<div class="column field is-5">
+							<label class="label" for="question1">Question 1</label>
+							<div class="control">
+								<input class="input" type="text" name="question[]" id="question1" maxlength="45"
+									   required>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="columns">
+					<div class="column">
+						<br>
+						<button type="button" id="addQuestionBtn" class="button is-link is-outlined">Add question</button>
+				</div>
+				</div>
+				<br>
+				<input type="submit" name="Create Questionnaire" value="Create">
+			</fieldset>
+		</form>
+	</div>
+	
+</body>
+</html>

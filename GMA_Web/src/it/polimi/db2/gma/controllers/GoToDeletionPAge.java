@@ -2,8 +2,9 @@ package it.polimi.db2.gma.controllers;
 
 import it.polimi.db2.gma.entities.Questionnaire;
 import it.polimi.db2.gma.entities.User;
-import it.polimi.db2.gma.exceptions.QuestionnaireException;
+import it.polimi.db2.gma.exceptions.AccessException;
 import it.polimi.db2.gma.services.QuestionnaireService;
+import it.polimi.db2.gma.services.UserService;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
@@ -18,15 +19,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-@WebServlet("/Leaderboard")
-public class Leaderboard extends HttpServlet {
+@WebServlet("/Deletion")
+public class GoToDeletionPAge extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private TemplateEngine templateEngine;
 	@EJB(name = "it.polimi.db2.gma.services/QuestionnaireService")
 	private QuestionnaireService qService;
 
-	public Leaderboard() {
+
+	public GoToDeletionPAge() {
 		super();
 	}
 
@@ -51,33 +55,28 @@ public class Leaderboard extends HttpServlet {
 
 		User user = (User) session.getAttribute("user");
 
-		if(user.getAdmin()) {
+		if(!user.getAdmin()) {
 			String path = getServletContext().getContextPath() + "/Home";
 			response.sendRedirect(path);
 			return;
 		}
 
-		Questionnaire questionnaire = null;
-
+		List<Questionnaire> questionnaires = new ArrayList<>();
 		try {
-			  questionnaire = qService.getQuestOfTheDay();
+			questionnaires = qService.findAllPastQuestionnaires();
 		} catch (Exception e) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to get data");
 			return;
 		}
 
-
-		String path = "/WEB-INF/Leaderboard.html";
+		String path = "/WEB-INF/DeletionPage.html";
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-		ctx.setVariable("questionnaire", questionnaire);
+		ctx.setVariable("questionnaires", questionnaires);
 		templateEngine.process(path, ctx, response.getWriter());
+
 	}
 
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		doGet(request, response);
-	}
 
 	public void destroy() {
 	}

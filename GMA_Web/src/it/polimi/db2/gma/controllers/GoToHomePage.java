@@ -55,21 +55,27 @@ public class GoToHomePage extends HttpServlet {
 		Boolean alreadySubmitted = null;
 
 		try {
-
-			  questionnaire = qService.getQuestOfTheDay();
-			  alreadySubmitted = qService.checkSubmissionByUser(user);
+			questionnaire = qService.getQuestOfTheDay();
+			alreadySubmitted = qService.checkSubmissionByUser(user);
 		} catch (Exception e) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to get data");
 			return;
 		}
 
-		// Redirect to the Home page and add missions to the parameters
-		String path = "/WEB-INF/Home.html";
-		ServletContext servletContext = getServletContext();
-		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-		ctx.setVariable("questionnaire", questionnaire);
-		ctx.setVariable("alreadySubmitted", alreadySubmitted);
-		templateEngine.process(path, ctx, response.getWriter());
+		if(user.getAdmin() == false) {
+			String path = "/WEB-INF/Home.html";
+			ServletContext servletContext = getServletContext();
+			final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
+			ctx.setVariable("questionnaire", questionnaire);
+			ctx.setVariable("alreadySubmitted", alreadySubmitted);
+			templateEngine.process(path, ctx, response.getWriter());
+		}
+		else {
+			String path = "/WEB-INF/AdminHome.html";
+			ServletContext servletContext = getServletContext();
+			final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
+			templateEngine.process(path, ctx, response.getWriter());
+		}
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)

@@ -1,24 +1,14 @@
 package it.polimi.db2.gma.entities;
 
-import it.polimi.db2.gma.entities.PK.AccessPK;
-import it.polimi.db2.gma.entities.PK.QuestionnairePK;
-
 import java.io.Serializable;
 
 import javax.persistence.*;
 
-import java.math.BigDecimal;
-import java.sql.Time;
 import java.util.Date;
-
-/**
- * The persistent class for the expenses database table.
- *
- */
 
 @Entity
 @Table(name = "access", schema = "db_gamified_marketing_application")
-
+@NamedQuery(name = "Access.getUserAccessOfToday", query = "SELECT a FROM Access a  WHERE a.timestamp >= ?1 AND a.timestamp < ?2 AND a.user.user_id = ?3 ")
 public class Access implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -26,12 +16,16 @@ public class Access implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int access_id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY) //We never need to get user of a specific access
     @JoinColumn(name = "user")
     private User user;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date timestamp;
+
+    public Access() {
+
+    }
 
     public int getAccess_id() {
         return access_id;
@@ -54,6 +48,11 @@ public class Access implements Serializable {
     }
 
     public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public Access(User user, Date timestamp) {
+        this.user = user;
         this.timestamp = timestamp;
     }
 }

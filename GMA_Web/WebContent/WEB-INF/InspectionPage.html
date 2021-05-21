@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>InspectionPage</title>
+<link rel="stylesheet" type="text/css" media="all" href="../css/mystyle.css" th:href="@{/css/mystyle.css}" />
+</head>
+<body>
+	<div align="right">
+		<a th:href="@{/Logout}">Logout</a>
+	</div>
+	<div align="right">
+		<a th:href="@{/Home}">Homepage</a>
+	</div>
+	<h1>Inspection Page</h1>
+	<div>
+		<p>Here there is the list of the past questionnaires:</p>
+		<tr th:each="q : ${questionnaires}">
+			<td th:text="${q.date}"></td>
+			<td th:text="${ q.product.name}"></td>
+			<br><a th:href="@{/QuestionnaireData(questionnaireid=${q.questionnaire_id})}">Details</a></br>
+		</tr>
+	</div>
+
+</body>
+</html>

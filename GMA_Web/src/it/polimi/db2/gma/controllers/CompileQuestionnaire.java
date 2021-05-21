@@ -1,13 +1,10 @@
 package it.polimi.db2.gma.controllers;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ejb.EJB;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -20,12 +17,13 @@ import it.polimi.db2.gma.entities.Enum.Sex;
 import it.polimi.db2.gma.entities.Question;
 import it.polimi.db2.gma.entities.Questionnaire;
 import it.polimi.db2.gma.entities.User;
+import it.polimi.db2.gma.exceptions.OffensiveWordException;
+import it.polimi.db2.gma.services.OffensiveWordService;
 import it.polimi.db2.gma.services.QuestionnaireService;
+import it.polimi.db2.gma.services.UserService;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.WebContext;
-import org.thymeleaf.templatemode.TemplateMode;
-import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
 @WebServlet("/CompileQuestionnaire")
 public class CompileQuestionnaire extends HttpServlet {
@@ -33,6 +31,10 @@ public class CompileQuestionnaire extends HttpServlet {
 	private TemplateEngine templateEngine;
 	@EJB(name = "it.polimi.db2.gma.services/QuestionnaireService")
 	private QuestionnaireService qService;
+	@EJB(name = "it.polimi.db2.gma.services/UserService")
+	private UserService uService;
+	@EJB(name = "it.polimi.db2.gma.services/OffensiveWordService")
+	private OffensiveWordService wService;
 
 	public CompileQuestionnaire() {
 		super();
@@ -51,33 +53,56 @@ public class CompileQuestionnaire extends HttpServlet {
 			return;
 		}
 
+		User user = (User) session.getAttribute("user");
+
+		if(user.getAdmin()) {
+			String path = getServletContext().getContextPath() + "/Home";
+			response.sendRedirect(path);
+			return;
+		}
+
+		if(user.getBlocked()) {
+			String path = getServletContext().getContextPath() + "/Home";
+			response.sendRedirect(path);
+			return;
+		}
+
 		// Get and parse all parameters from request
-		int age = 0;
+		Integer age = null;
 		String sex_string = null;
 		String expertise_level_string = null;
-		List<String> answers = null;
+		List<String> answers = new ArrayList<>();
 		int questionnaireId = 0;
 		Questionnaire questionnaire = null;
 		Sex sex = null;
 		Expertise_level expertise_level = null;
 		try {
-			if (request.getParameter("Age") != null){
-			age = Integer.parseInt(request.getParameter("Age"));
+			if (!StringUtils.isBlank(request.getParameter("Age"))) {
+				age = Integer.parseInt(request.getParameter("Age"));
 				if(age < 16 || age > 100) {
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid age");
-				return;
+					response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid age");
+					return;
+				}
 			}
-			}
-			if (request.getParameter("Sex") != null) {
+			if (!StringUtils.isBlank(request.getParameter("Sex"))) {
 				sex_string = StringEscapeUtils.escapeJava(request.getParameter("Sex"));
 				sex = Sex.valueOf(sex_string);
 			}
-			if (request.getParameter("Expertise_Level") != null) {
-				expertise_level_string = StringEscapeUtils.escapeJava(request.getParameter("Expertise_Level"));
+			if (!StringUtils.isBlank(request.getParameter("Expertise_Level"))) {
+				expertise_level_string = StringEscapeUtils.escapeJava(request.getParameter("Expertise_Level").toUpperCase());
 				expertise_level = Expertise_level.valueOf(expertise_level_string);
+			}
+
+			if(request.getParameter("questionnaireId") == null) {
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing questionnaire parameter");
+				return;
 			}
 			questionnaireId = Integer.parseInt(request.getParameter("questionnaireId"));
 			questionnaire = qService.findQuestionnaireById(questionnaireId);
+			if(questionnaire == null) {
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid questionnaire id");
+				return;
+			}
 			for (Question q : questionnaire.getQuestions()) {
 				String answer = request.getParameter(String.valueOf(q.getQuestionId()));
 				if(answer == null) {
@@ -90,19 +115,26 @@ public class CompileQuestionnaire extends HttpServlet {
 			e.printStackTrace();
 		}
 
-		// Create mission in DB
-		User user = (User) session.getAttribute("user");
+		// Create answers in DB
 		try {
-			qService.compileQuestionnaire (age, sex, expertise_level, answers, user.getUser_id(), questionnaireId);
-		} catch (Exception e) {
+			if(wService.checkOffensiveWord(answers)){
+				user.setBlocked(true);
+				uService.updateUser(user);
+			}
+			else {
+				qService.compileQuestionnaire(age, sex, expertise_level, answers, user.getUser_id(), questionnaireId);
+			}
+			uService.deleteAccess(user);
+		} catch (Exception | OffensiveWordException e) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to compile the questionnaire");
 			return;
 		}
 
 		// return the user to the right view
 		String ctxpath = getServletContext().getContextPath();
-		String path = ctxpath + "/Home";
+		String path = ctxpath + "/SubmissionPage";
 		response.sendRedirect(path);
+
 	}
 
 	public void destroy() {

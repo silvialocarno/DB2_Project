@@ -11,7 +11,7 @@ public class MarketingAnswerPK implements Serializable {
     @Column(name = "user")
     private int userId;
 
-    @Column(name = "question")
+    @Column(name = "question_id", insertable = false, updatable = false)
     private int questionId;
 
     @Column(name = "questionnaire")

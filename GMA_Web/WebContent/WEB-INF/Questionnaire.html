@@ -3,8 +3,8 @@
 <head>
 <meta charset="ISO-8859-1">
 <title>Questionnaire</title>
-<link rel="stylesheet" type="text/css" media="all"
-	href="../css/mystyle.css" th:href="@{/css/mystyle.css}" />
+<link rel="stylesheet" type="text/css" media="all" href="../css/mystyle.css" th:href="@{/css/mystyle.css}" />
+<script src="../js/questionnaire.js" th:src="@{/js/questionnaire.js}" charset="UTF-8" defer></script>
 </head>
 <body>
 	<div align="right">
@@ -14,36 +14,45 @@
 	<h1>Questionnaire of the day</h1>
 	<div>
 		<p>Compile the following form:</p>
-		<form action="#" th:action="@{/CompileQuestionnaire}" method="POST">
+		<form id="questionnaire" action="#" th:action="@{/CompileQuestionnaire}" method="POST">
 			<fieldset>
+				<div id="marketing_questions">
 					<th:block th:each="q : ${questionnaire.getQuestions()}">
-						<p th:text="${q.getQuestion_text()}" />
-						<input type="text" th:name="${q.getQuestionId()}" required />
+						<p th:text="${q.getQuestion_text()}"></p>
+						<p>
+							<input type="text" th:name="${q.getQuestionId()}" required />
+						</p>
 					</th:block>
+				</div>
 
-				<p>
-					Age: <input type="number" name="Age" min="16" max="99"/>
-				</p>
+				<div id="statistical_questions">
+					<p>
+						Age: <input type="number" name="Age" min="16" max="99"/>
+					</p>
 
-				<p>
-					Sex: <select name="Sex">
-						<option></option>
-						<option value="M">M</option>
-						<option value="F">F</option>
-						<option value="N">N</option>
-					</select>
-				</p>
+					<p>
+						Sex: <select name="Sex">
+							<option></option>
+							<option value="M">M</option>
+							<option value="F">F</option>
+							<option value="N">N</option>
+						</select>
+					</p>
 
-				<p>
-					Expertise level: <select name="Expertise_Level">
-						<option></option>
-						<option value="LOW">Low</option>
-						<option value="MEDIUM">Medium</option>
-						<option value="HIGH">High</option>
-					</select>
-				</p>
+					<p>
+						Expertise level: <select name="Expertise_Level">
+							<option></option>
+							<option value="LOW">Low</option>
+							<option value="MEDIUM">Medium</option>
+							<option value="HIGH">High</option>
+						</select>
+					</p>
+				</div>
 				<input type="hidden" name="questionnaireId" th:value="${questionnaire.getQuestionnaire_id()}">
-				<input type="submit" name="Next">
+				<button id="prev_button" type="button">Previous</button>
+				<button id="next_button" type="button">Next</button>
+				<input id="submit_button" type="submit" name="Submit">
+				<a th:href="@{/Home}">Cancel</a>
 			</fieldset>
 		</form>
 	</div>

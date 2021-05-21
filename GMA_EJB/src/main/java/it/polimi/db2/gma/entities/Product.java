@@ -9,13 +9,9 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 
-/**
- * The persistent class for the expenses database table.
- * 
- */
-
 @Entity
 @Table(name = "product", schema = "db_gamified_marketing_application")
+@NamedQuery(name = "Product.findAll", query = "SELECT p FROM Product p")
 
 public class Product implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -30,6 +26,21 @@ public class Product implements Serializable {
 
 	private String name;
 
+	@OneToMany(mappedBy = "product", fetch = FetchType.EAGER) //From the product I have to get the reviews associated to the product
+	private List<Review> reviews;
+
+	@OneToMany(mappedBy = "product") //We don't need to get the questionnaires from the product because we do GetQuestOfTheDay to retrieve the questionnaire
+	private List<Questionnaire> questionnaires;
+
+	public Product(String name, byte[] photo) {
+		this.photo = photo;
+		this.name = name;
+	}
+
+	public Product(){
+
+	}
+
 	public int getProduct_id() {
 		return product_id;
 	}
@@ -37,12 +48,6 @@ public class Product implements Serializable {
 	public void setProduct_id(int product_id) {
 		this.product_id = product_id;
 	}
-
-	@OneToMany(mappedBy = "product")
-	private List<Review> reviews;
-
-	@OneToMany(mappedBy = "product")
-	private List<Questionnaire> questionnaires;
 
 	public List<Review> getReviews() {
 		return reviews;
@@ -79,4 +84,5 @@ public class Product implements Serializable {
 	public void setName(String name) {
 		this.name = name;
 	}
+
 }

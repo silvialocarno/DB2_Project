@@ -8,20 +8,20 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "leaderboard", schema = "db_gamified_marketing_application")
-@NamedQuery(name = "Leaderboard.checkSubmissionByUser", query = "SELECT l.user FROM Leaderboard l WHERE l.questionnaire.date = CURRENT_DATE and l.user= ?1")
+@Table(name = "statistical_answer", schema = "db_gamified_marketing_application")
+@NamedQuery(name = "StatisticalAnswer.findAllAnswers", query = "SELECT a FROM StatisticalAnswer a WHERE a.id.questionnaireId=?1")
 public class StatisticalAnswer implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @EmbeddedId
     private StatisticalAnswerPK id;
 
-    @ManyToOne
+    @ManyToOne //EAGER, questionnaireDetails html
     @MapsId("userId")
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY) //We never get the questionnaire from the statistical answer
     @MapsId("questionnaireId")
     @JoinColumn(name = "questionnaire_id")
     private Questionnaire questionnaire;
@@ -32,9 +32,9 @@ public class StatisticalAnswer implements Serializable {
     @Enumerated(EnumType.STRING)
     private Expertise_level expertise_level;
 
-    private int age;
+    private Integer age;
 
-    public StatisticalAnswer(User user, Sex sex, int age, Expertise_level expertise_level, Questionnaire questionnaire) {
+    public StatisticalAnswer(User user, Sex sex, Integer age, Expertise_level expertise_level, Questionnaire questionnaire) {
         this.id = new StatisticalAnswerPK(user.getUser_id(), questionnaire.getQuestionnaire_id());
         this.user = user;
         this.sex = sex;
@@ -45,6 +45,22 @@ public class StatisticalAnswer implements Serializable {
 
     public StatisticalAnswer() {
 
+    }
+
+    public User getAnswerUser() {
+        return user;
+    }
+
+    public void setAnswerUser(User user) {
+        this.user = user;
+    }
+
+    public Questionnaire getQuestionnaire() {
+        return questionnaire;
+    }
+
+    public void setQuestionnaire(Questionnaire questionnaire) {
+        this.questionnaire = questionnaire;
     }
 
     public StatisticalAnswerPK getStatisticalAnswerId() {
@@ -71,27 +87,39 @@ public class StatisticalAnswer implements Serializable {
         this.questionnaire = questionnaire;
     }
 
-    public Sex getSex() {
-        return sex;
+    public String getSex() {
+        if(sex == null) {
+            return "";
+        }
+        else
+            return sex.toString();
     }
 
     public void setSex(Sex sex) {
         this.sex = sex;
     }
 
-    public Expertise_level getExpertise_level() {
-        return expertise_level;
+    public String getExpertise_level() {
+        if(expertise_level == null) {
+            return "";
+        }
+        else
+            return expertise_level.toString();
     }
 
     public void setExpertise_level(Expertise_level expertise_level) {
         this.expertise_level = expertise_level;
     }
 
-    public int getAge() {
-        return age;
+    public String getAge() {
+        if(age == null) {
+            return "";
+        }
+        else
+            return age.toString();
     }
 
-    public void setAge(int age) {
+    public void setAge(Integer age) {
         this.age = age;
     }
 }

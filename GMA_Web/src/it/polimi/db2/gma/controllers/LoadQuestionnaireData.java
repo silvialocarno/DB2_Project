@@ -1,9 +1,13 @@
 package it.polimi.db2.gma.controllers;
 
-import it.polimi.db2.gma.entities.Questionnaire;
-import it.polimi.db2.gma.entities.User;
-import it.polimi.db2.gma.exceptions.QuestionnaireException;
+import it.polimi.db2.gma.entities.*;
+import it.polimi.db2.gma.entities.utils.ImageUtils;
+import it.polimi.db2.gma.exceptions.AccessException;
+import it.polimi.db2.gma.exceptions.ProductException;
+import it.polimi.db2.gma.exceptions.UserException;
+import it.polimi.db2.gma.services.ProductService;
 import it.polimi.db2.gma.services.QuestionnaireService;
+import it.polimi.db2.gma.services.UserService;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
@@ -13,20 +17,24 @@ import javax.ejb.EJB;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.*;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
-@WebServlet("/Leaderboard")
-public class Leaderboard extends HttpServlet {
+@WebServlet("/QuestionnaireData")
+public class LoadQuestionnaireData extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private TemplateEngine templateEngine;
 	@EJB(name = "it.polimi.db2.gma.services/QuestionnaireService")
 	private QuestionnaireService qService;
+	@EJB(name = "it.polimi.db2.gma.services/UserService")
+	private UserService usrService;
+	@EJB(name = "it.polimi.db2.gma.services/ProductService")
+	private ProductService pService;
 
-	public Leaderboard() {
+	public LoadQuestionnaireData() {
 		super();
 	}
 
@@ -39,8 +47,10 @@ public class Leaderboard extends HttpServlet {
 		templateResolver.setSuffix(".html");
 	}
 
+
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+
 		// If the user is not logged in (not present in session) redirect to the login
 		String loginpath = getServletContext().getContextPath() + "/index.html";
 		HttpSession session = request.getSession();
@@ -51,32 +61,40 @@ public class Leaderboard extends HttpServlet {
 
 		User user = (User) session.getAttribute("user");
 
-		if(user.getAdmin()) {
+		if(!user.getAdmin()) {
 			String path = getServletContext().getContextPath() + "/Home";
 			response.sendRedirect(path);
 			return;
 		}
 
-		Questionnaire questionnaire = null;
-
+		// get and check params
+		Integer questionnaireId = null;
 		try {
-			  questionnaire = qService.getQuestOfTheDay();
-		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to get data");
+			questionnaireId = Integer.parseInt(request.getParameter("questionnaireid"));
+		} catch (NumberFormatException | NullPointerException e) {
+			// only for debugging e.printStackTrace();
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values");
 			return;
 		}
 
+		Questionnaire questionnaire = qService.findQuestionnaireById(questionnaireId);
+		List<MarketingAnswer> marketingAnswers = new ArrayList<>();
+		List<StatisticalAnswer> statisticalAnswers = new ArrayList<>();
+		List<User> cancelUsers = new ArrayList<>();
 
-		String path = "/WEB-INF/Leaderboard.html";
+		marketingAnswers = qService.findAllMarketingAnswers(questionnaireId);
+		statisticalAnswers = qService.findAllStatisticalAnswers(questionnaireId);
+
+		cancelUsers = usrService.getCancelUser(questionnaire.getDate());
+
+		String path = "/WEB-INF/QuestionnaireDetails.html";
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
+		ctx.setVariable("marketingAnswers", marketingAnswers);
+		ctx.setVariable("statisticalAnswers", statisticalAnswers);
+		ctx.setVariable("cancelUsers", cancelUsers);
 		ctx.setVariable("questionnaire", questionnaire);
 		templateEngine.process(path, ctx, response.getWriter());
-	}
-
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		doGet(request, response);
 	}
 
 	public void destroy() {

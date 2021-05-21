@@ -8,35 +8,38 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "marketing_answer", schema = "db_gamified_marketing_application")
+@NamedQuery(name = "MarketingAnswer.findAllAnswers", query = "SELECT a FROM MarketingAnswer a WHERE a.id.questionnaireId=?1")
 public class MarketingAnswer implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @EmbeddedId
     private MarketingAnswerPK id;
 
-    @ManyToOne
+    @ManyToOne //We need to retrieve the user for the admin inspection
     @MapsId("userId")
     @JoinColumn(name = "user")
     private User user;
 
+    //TODO: capire questionnaire e questionId
+
     @MapsId("questionId")
-    @Column(name = "question_id")
+    @Column(name = "question_id", insertable = false, updatable = false)
     private int questionId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY) //We go from the questionnaire to the answers and not viceversa
     @MapsId("questionnaireId")
-    @JoinColumn(name = "questionnaire")
+    @JoinColumn(name = "questionnaire", insertable = false, updatable = false)
     private Questionnaire questionnaire;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL) //From the answer we get the question in the inspection
     @JoinColumns({
-            @JoinColumn(name = "questionnaire", referencedColumnName = "questionnaire", insertable = false, updatable = false),
-            @JoinColumn(name = "question_id", referencedColumnName = "question_id", insertable = false, updatable = false)
+            @JoinColumn(name = "questionnaire", referencedColumnName = "questionnaire"),
+            @JoinColumn(name = "question_id", referencedColumnName = "question_id")
     })
     private Question question;
 
     public MarketingAnswer(User user, Question question, String answer_text) {
-        this.id = new MarketingAnswerPK(user.getUser_id(), question.getQuestionId(), questionnaire.getQuestionnaire_id());
+        this.id = new MarketingAnswerPK(user.getUser_id(), question.getQuestionId(), question.getQuestionnaire().getQuestionnaire_id());
         this.user = user;
         this.questionId = question.getQuestionId();
         this.questionnaire = question.getQuestionnaire();

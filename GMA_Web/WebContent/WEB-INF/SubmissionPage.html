@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>SubmissionPage</title>
+<link rel="stylesheet" type="text/css" media="all" href="../css/mystyle.css" th:href="@{/css/mystyle.css}" />
+</head>
+<body>
+	<div align="right">
+		<a th:href="@{/Logout}">Logout</a>
+	</div>
+	<div align="right">
+		<a th:href="@{/Home}">Homepage</a>
+	</div>
+
+	<h1 th:if = "${session.user.getBlocked()}">We are sorry, you have been blocked for inserting an offensive word!</h1>
+	<h1 th:if="${not session.user.getBlocked()}">Thank you for compiling the questionnaire of the day! </h1>
+</body>
+</html>

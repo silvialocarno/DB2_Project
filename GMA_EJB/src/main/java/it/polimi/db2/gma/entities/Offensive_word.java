@@ -8,13 +8,9 @@ import java.math.BigDecimal;
 import java.sql.Time;
 import java.util.Date;
 
-/**
- * The persistent class for the expenses database table.
- *
- */
-
 @Entity
 @Table(name = "offensive_word", schema = "db_gamified_marketing_application")
+@NamedQuery(name = "Offensive_word.findAll", query = "SELECT w FROM Offensive_word w")
 
 public class Offensive_word implements Serializable {
     private static final long serialVersionUID = 1L;

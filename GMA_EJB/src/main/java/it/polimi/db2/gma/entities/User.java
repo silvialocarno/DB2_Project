@@ -2,16 +2,14 @@ package it.polimi.db2.gma.entities;
 
 import java.io.Serializable;
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
-/**
- * The persistent class for the usertable database table.
- * 
- */
 @Entity
 @Table(name = "user", schema = "db_gamified_marketing_application")
 @NamedQuery(name = "User.checkCredentials", query = "SELECT u FROM User u  WHERE u.username = ?1 and u.password = ?2")
-
+@NamedQuery(name = "User.findAll", query = "SELECT u FROM User u")
+@NamedQuery(name = "User.getCancelUser", query = "SELECT u FROM User u, Access a WHERE u.user_id=a.user.user_id AND a.timestamp BETWEEN ?1 AND ?2")
 public class User implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -28,6 +26,15 @@ public class User implements Serializable {
 	private Boolean blocked;
 
 	private Boolean admin;
+
+	@OneToMany(mappedBy = "user")
+	private List<Score> scores;
+
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
+	private List<Access> accesses = new ArrayList<>();
+
+	@OneToMany(mappedBy = "user")
+	private List<Review> reviews;
 
 	public int getUser_id() {
 		return user_id;
@@ -69,11 +76,21 @@ public class User implements Serializable {
 		this.blocked = blocked;
 	}
 
-	@OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
-	private List<Access> accesses;
+	public Boolean getAdmin() {
+		return admin;
+	}
 
-	@OneToMany(mappedBy = "user")
-	private List<Review> reviews;
+	public void setAdmin(Boolean admin) {
+		this.admin = admin;
+	}
+
+	public List<Score> getScores() {
+		return scores;
+	}
+
+	public void setScores(List<Score> scores) {
+		this.scores = scores;
+	}
 
 	public List<Access> getAccesses() {
 		return accesses;
@@ -90,4 +107,13 @@ public class User implements Serializable {
 	public void setReviews(List<Review> reviews) {
 		this.reviews = reviews;
 	}
+
+	public void addAccess(Access access) {
+		accesses.add(access);
+	}
+
+	public void deleteAccess(Access access) {
+		accesses.remove(access);
+	}
+
 }

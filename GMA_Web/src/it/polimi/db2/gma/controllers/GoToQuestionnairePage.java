@@ -2,7 +2,9 @@ package it.polimi.db2.gma.controllers;
 
 import it.polimi.db2.gma.entities.Questionnaire;
 import it.polimi.db2.gma.entities.User;
+import it.polimi.db2.gma.exceptions.AccessException;
 import it.polimi.db2.gma.services.QuestionnaireService;
+import it.polimi.db2.gma.services.UserService;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
@@ -17,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.Date;
 
 @WebServlet("/Questionnaire")
 public class GoToQuestionnairePage extends HttpServlet {
@@ -24,6 +27,8 @@ public class GoToQuestionnairePage extends HttpServlet {
 	private TemplateEngine templateEngine;
 	@EJB(name = "it.polimi.db2.gma.services/QuestionnaireService")
 	private QuestionnaireService qService;
+	@EJB(name = "it.polimi.db2.gma.services/UserService")
+	private UserService usrService;
 
 	public GoToQuestionnairePage() {
 		super();
@@ -50,13 +55,31 @@ public class GoToQuestionnairePage extends HttpServlet {
 
 		User user = (User) session.getAttribute("user");
 
+		if(user.getAdmin()) {
+			String path = getServletContext().getContextPath() + "/Home";
+			response.sendRedirect(path);
+			return;
+		}
+
+
+		if(user.getBlocked()) {
+			String path = getServletContext().getContextPath() + "/Home";
+			response.sendRedirect(path);
+			return;
+		}
+
 		Questionnaire questionnaire = null;
 		try {
-
 			questionnaire = qService.getQuestOfTheDay();
 		} catch (Exception e) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to get data");
 			return;
+		}
+
+		try {
+			usrService.registerAccess(user);
+		} catch (AccessException e) {
+			e.printStackTrace();
 		}
 
 		String path = "/WEB-INF/Questionnaire.html";
@@ -64,6 +87,7 @@ public class GoToQuestionnairePage extends HttpServlet {
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 		ctx.setVariable("questionnaire", questionnaire);
 		templateEngine.process(path, ctx, response.getWriter());
+
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)

@@ -7,9 +7,9 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "leaderboard", schema = "db_gamified_marketing_application")
-@NamedQuery(name = "Leaderboard.checkSubmissionByUser", query = "SELECT l.user FROM Leaderboard l WHERE l.questionnaire.date = CURRENT_DATE and l.user= ?1")
-public class Leaderboard implements Serializable {
+@Table(name = "score", schema = "db_gamified_marketing_application")
+@NamedQuery(name = "Score.checkSubmissionByUser", query = "SELECT s.user FROM Score s WHERE s.questionnaire.date = CURRENT_DATE and s.user= ?1")
+public class Score implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @EmbeddedId
@@ -17,18 +17,15 @@ public class Leaderboard implements Serializable {
 
     private int score;
 
-    @ManyToOne
+    @ManyToOne //EAGER Html leaderboard
     @MapsId("userId")
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("questionnaireId")
     @JoinColumn(name = "questionnaire_id")
     private Questionnaire questionnaire;
-
-    @Enumerated(EnumType.STRING)
-    private Sex sex;
 
     public LeaderboardPK getLeaderboardId() {
         return id;

@@ -21,7 +21,8 @@
 	<div th:if="${questionnaire != null}">
 		<p th:text="${'Nice to see you again ' + session.user.username + '!\n Here there is the product of the day:'}"></p>
 		<p th:text = "${'Name: ' + questionnaire.getProduct().getName()}"></p>
-		<img th:src="*{'data:image/png;base64,'+ questionnaire.getProduct().getPhotoData()}">
+		<img width="500px" th:src="*{'data:image/png;base64,'+ questionnaire.getProduct().getPhotoData()}">
+		<p th:text="${'\n'}"></p>
 		<p th:if = "${session.user.getBlocked()}">You are blocked!</p>
 		<p th:if="${not session.user.getBlocked() && alreadySubmitted}"> The questionnaire of the day has been already submitted </p>
 		<a th:if="${not session.user.getBlocked() && not alreadySubmitted}" th:href="@{/Questionnaire}">Questionnaire</a>

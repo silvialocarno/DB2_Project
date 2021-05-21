@@ -1,9 +1,13 @@
 package it.polimi.db2.gma.controllers;
 
+import it.polimi.db2.gma.entities.Product;
 import it.polimi.db2.gma.entities.Questionnaire;
 import it.polimi.db2.gma.entities.User;
-import it.polimi.db2.gma.exceptions.QuestionnaireException;
+import it.polimi.db2.gma.exceptions.AccessException;
+import it.polimi.db2.gma.exceptions.ProductException;
+import it.polimi.db2.gma.services.ProductService;
 import it.polimi.db2.gma.services.QuestionnaireService;
+import it.polimi.db2.gma.services.UserService;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
@@ -18,15 +22,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.List;
 
-@WebServlet("/Leaderboard")
-public class Leaderboard extends HttpServlet {
+@WebServlet("/Creation")
+public class GoToCreationPage extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private TemplateEngine templateEngine;
 	@EJB(name = "it.polimi.db2.gma.services/QuestionnaireService")
 	private QuestionnaireService qService;
+	@EJB(name = "it.polimi.db2.gma.services/UserService")
+	private UserService usrService;
+	@EJB(name = "it.polimi.db2.gma.services/ProductService")
+	private ProductService pService;
 
-	public Leaderboard() {
+	public GoToCreationPage() {
 		super();
 	}
 
@@ -51,27 +60,26 @@ public class Leaderboard extends HttpServlet {
 
 		User user = (User) session.getAttribute("user");
 
-		if(user.getAdmin()) {
+		if(!user.getAdmin()) {
 			String path = getServletContext().getContextPath() + "/Home";
 			response.sendRedirect(path);
 			return;
 		}
 
-		Questionnaire questionnaire = null;
-
+		List<Product> products = null;
 		try {
-			  questionnaire = qService.getQuestOfTheDay();
-		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to get data");
-			return;
+			products = pService.findAllProducts();
+		} catch (ProductException e) {
+			e.printStackTrace();
 		}
 
 
-		String path = "/WEB-INF/Leaderboard.html";
+		String path = "/WEB-INF/CreationPage.html";
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-		ctx.setVariable("questionnaire", questionnaire);
+		ctx.setVariable("products", products);
 		templateEngine.process(path, ctx, response.getWriter());
+
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)

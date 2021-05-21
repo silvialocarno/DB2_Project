@@ -14,7 +14,8 @@
 		<class>it.polimi.db2.gma.entities.Review</class>
 		<class>it.polimi.db2.gma.entities.Questionnaire</class>
 		<class>it.polimi.db2.gma.entities.MarketingAnswer</class>
-		<class>it.polimi.db2.gma.entities.Leaderboard</class>
+		<class>it.polimi.db2.gma.entities.Score</class>
+		<class>it.polimi.db2.gma.entities.StatisticalAnswer</class>
 		<properties>
 			<property name="eclipselink.logging.level" value="FINE" />
 		</properties>

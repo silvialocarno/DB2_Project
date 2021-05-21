@@ -1,15 +1,11 @@
 package it.polimi.db2.gma.controllers;
 
-import it.polimi.db2.gma.entities.Questionnaire;
 import it.polimi.db2.gma.entities.User;
-import it.polimi.db2.gma.exceptions.QuestionnaireException;
-import it.polimi.db2.gma.services.QuestionnaireService;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
-import javax.ejb.EJB;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -19,14 +15,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
-@WebServlet("/Leaderboard")
-public class Leaderboard extends HttpServlet {
+@WebServlet("/SubmissionPage")
+public class GoToSubmissionPage extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private TemplateEngine templateEngine;
-	@EJB(name = "it.polimi.db2.gma.services/QuestionnaireService")
-	private QuestionnaireService qService;
 
-	public Leaderboard() {
+	public GoToSubmissionPage() {
 		super();
 	}
 
@@ -57,20 +51,15 @@ public class Leaderboard extends HttpServlet {
 			return;
 		}
 
-		Questionnaire questionnaire = null;
-
-		try {
-			  questionnaire = qService.getQuestOfTheDay();
-		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to get data");
+		if(user.getBlocked()) {
+			String path = getServletContext().getContextPath() + "/Home";
+			response.sendRedirect(path);
 			return;
 		}
 
-
-		String path = "/WEB-INF/Leaderboard.html";
+		String path = "/WEB-INF/SubmissionPage.html";
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-		ctx.setVariable("questionnaire", questionnaire);
 		templateEngine.process(path, ctx, response.getWriter());
 	}
 
