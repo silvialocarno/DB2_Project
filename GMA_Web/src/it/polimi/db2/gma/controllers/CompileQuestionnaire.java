@@ -55,12 +55,14 @@ public class CompileQuestionnaire extends HttpServlet {
 
 		User user = (User) session.getAttribute("user");
 
+		// If the user is the admin redirect to his Adminhome
 		if(user.getAdmin()) {
 			String path = getServletContext().getContextPath() + "/Home";
 			response.sendRedirect(path);
 			return;
 		}
 
+		// If the user is blocked redirect to home
 		if(user.getBlocked()) {
 			String path = getServletContext().getContextPath() + "/Home";
 			response.sendRedirect(path);

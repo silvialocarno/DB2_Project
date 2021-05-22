@@ -38,6 +38,7 @@ public class DeleteQuestionnaire extends HttpServlet {
 
         User user = (User) session.getAttribute("user");
 
+        // If the user is not the admin, redirect him to his home
         if(!user.getAdmin()) {
             String path = getServletContext().getContextPath() + "/Home";
             response.sendRedirect(path);

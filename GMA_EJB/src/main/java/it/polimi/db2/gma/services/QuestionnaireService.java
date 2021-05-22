@@ -83,7 +83,6 @@ public class QuestionnaireService {
 			Question question = new Question(questionnaire, questions.get(i), i);
 			questionnaire.addQuestion(question);
 		}
-		//em.merge(questionnaire);
 		em.flush();
     }
 

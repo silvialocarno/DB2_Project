@@ -51,6 +51,7 @@ public class Leaderboard extends HttpServlet {
 
 		User user = (User) session.getAttribute("user");
 
+		// If the user is an admin, redirect him to admin home
 		if(user.getAdmin()) {
 			String path = getServletContext().getContextPath() + "/Home";
 			response.sendRedirect(path);

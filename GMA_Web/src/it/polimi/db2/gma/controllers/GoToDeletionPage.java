@@ -23,14 +23,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet("/Deletion")
-public class GoToDeletionPAge extends HttpServlet {
+public class GoToDeletionPage extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private TemplateEngine templateEngine;
 	@EJB(name = "it.polimi.db2.gma.services/QuestionnaireService")
 	private QuestionnaireService qService;
 
 
-	public GoToDeletionPAge() {
+	public GoToDeletionPage() {
 		super();
 	}
 
@@ -55,6 +55,7 @@ public class GoToDeletionPAge extends HttpServlet {
 
 		User user = (User) session.getAttribute("user");
 
+		// If the user is not the admin, redirect him to his home
 		if(!user.getAdmin()) {
 			String path = getServletContext().getContextPath() + "/Home";
 			response.sendRedirect(path);

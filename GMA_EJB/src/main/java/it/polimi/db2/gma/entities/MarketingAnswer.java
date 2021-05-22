@@ -20,8 +20,6 @@ public class MarketingAnswer implements Serializable {
     @JoinColumn(name = "user")
     private User user;
 
-    //TODO: capire questionnaire e questionId
-
     @MapsId("questionId")
     @Column(name = "question_id", insertable = false, updatable = false)
     private int questionId;

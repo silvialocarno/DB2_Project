@@ -61,6 +61,7 @@ public class LoadQuestionnaireData extends HttpServlet {
 
 		User user = (User) session.getAttribute("user");
 
+		// If the user is not an admin, redirect him to is home
 		if(!user.getAdmin()) {
 			String path = getServletContext().getContextPath() + "/Home";
 			response.sendRedirect(path);

@@ -45,12 +45,14 @@ public class GoToSubmissionPage extends HttpServlet {
 
 		User user = (User) session.getAttribute("user");
 
+		//If the user is an admin, redirect him to Admin home
 		if(user.getAdmin()) {
 			String path = getServletContext().getContextPath() + "/Home";
 			response.sendRedirect(path);
 			return;
 		}
 
+		// If the user is blocked redirect him to his home
 		if(user.getBlocked()) {
 			String path = getServletContext().getContextPath() + "/Home";
 			response.sendRedirect(path);

@@ -62,7 +62,7 @@ public class GoToHomePage extends HttpServlet {
 			return;
 		}
 
-		if(user.getAdmin() == false) {
+		if(!user.getAdmin()) {
 			String path = "/WEB-INF/Home.html";
 			ServletContext servletContext = getServletContext();
 			final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
